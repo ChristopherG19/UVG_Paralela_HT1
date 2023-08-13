@@ -11,6 +11,7 @@
 #include <omp.h>
 #include <math.h>
 
+// Definimos las funciones
 double cuadratic_func(double x);
 double cubic_func(double x);
 double sin_func(double x);
@@ -34,16 +35,17 @@ int main(int argc, char *argv[])
         op = strtol(argv[3], NULL, 10);
     }
 
+    // Se obtiene h
+    double h = get_h(a, b);
+
+    // Opciones para determinar que función se ejecutará
     if(op == 1){
-        double h = get_h(a, b);
         double resultado = trapezoides(cuadratic_func, a, b, h);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else if(op == 2){
-        double h = get_h(a, b);
         double resultado = trapezoides(cubic_func, a, b, h);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else if(op == 3){
-        double h = get_h(a, b);
         double resultado = trapezoides(sin_func, a, b, h);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else {
@@ -53,10 +55,15 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// Función trapezoides
+// Recibe una función, a, b y h
 double trapezoides(double (*func)(double), double a, double b, double h){
+    
+    // Se definen variables para almacenar resultados y utilizadas en el cálculo
     double sum = 0.0;
     sum = (func(a) + func(b)) / 2.0;
 
+    // Ciclo for que simula la parte secuencial
     for(int i = 1; i < n; i++){
         double x = a + i * h;
         sum += func(x);
@@ -66,18 +73,22 @@ double trapezoides(double (*func)(double), double a, double b, double h){
     return sum;
 }
 
+// Función get_h: Retorna el valor de h
 double get_h(double a, double b){
     return (b-a)/n;
 }
 
+// Función cuadrática: Retorna el valor cuadrático de x
 double cuadratic_func(double x){
     return pow(x,2);
 }
 
+// Función cúbica: Retorna el valor cúbico de x
 double cubic_func(double x){
     return 2.0 * pow(x,3);
 }
 
+// Función sinusoidal: Retorna el valor de seno de x
 double sin_func(double x){
     return sin(x);
 }

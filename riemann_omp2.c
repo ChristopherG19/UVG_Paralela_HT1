@@ -11,6 +11,7 @@
 #include <omp.h>
 #include <math.h>
 
+// Definimos las funciones
 double cuadratic_func(double x);
 double cubic_func(double x);
 double sin_func(double x);
@@ -35,22 +36,24 @@ int main(int argc, char *argv[])
         num_threads = strtol(argv[3], NULL, 10);
         op = strtol(argv[4], NULL, 10);
 
+        // Verificación de número de threads
         if(n % num_threads != 0){
             fprintf(stderr, "Número de trapezoides no es múltiplo de número de threads\n");
         }
 
     }
 
+    // Se obtiene h
+    double h = get_h(a, b);
+
+    // Opciones para determinar que función se ejecutará
     if(op == 1){
-        double h = get_h(a, b);
         double resultado = trapezoides(cuadratic_func, a, b, h, num_threads);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else if(op == 2){
-        double h = get_h(a, b);
         double resultado = trapezoides(cubic_func, a, b, h, num_threads);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else if(op == 3){
-        double h = get_h(a, b);
         double resultado = trapezoides(sin_func, a, b, h, num_threads);
         printf("Con n = %d, nuestra aproximacion\nde la integral de %f a %f es = %f\n",n,a,b,resultado);
     } else {
@@ -60,18 +63,25 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// Función trapezoides
+// Recibe una función, a, b, h y el número de threads
 double trapezoides(double (*func)(double), double a, double b, double h, int threads){
+
+    // Se definen variables para almacenar resultados y utilizadas en el cálculo
     double sum = 0.0;
     double sumF = 0.0;
     int n_local = n/threads;
-    
+
+    // Paralelización    
     #pragma omp parallel num_threads(threads)
     {
+        // Definimos variables para el cálculo
         int ID_thread = omp_get_thread_num();
         double a_local = a + ID_thread * n_local * h;
         double b_local = a_local + n_local * h;
         sumF = (func(a_local) + func(b_local)) / 2.0;
 
+        // Ciclo for que simula la parte secuencial
         for(int i = 1; i < n_local; i++){
             double x = a_local + i * h;
             sumF += func(x);
@@ -86,18 +96,22 @@ double trapezoides(double (*func)(double), double a, double b, double h, int thr
     return sum;
 }
 
+// Función get_h: Retorna el valor de h
 double get_h(double a, double b){
     return (b-a)/n;
 }
 
+// Función cuadrática: Retorna el valor cuadrático de x
 double cuadratic_func(double x){
     return pow(x,2);
 }
 
+// Función cúbica: Retorna el valor cúbico de x
 double cubic_func(double x){
     return 2.0 * pow(x,3);
 }
 
+// Función sinusoidal: Retorna el valor de seno de x
 double sin_func(double x){
     return sin(x);
 }

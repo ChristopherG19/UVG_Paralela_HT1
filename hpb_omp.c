@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 }
 
 void hbd_msg(void){
+    // Obtención de número de thread y cantidad de threads
     int thread_num = omp_get_thread_num();
     int cant_threads = omp_get_num_threads();
     if (thread_num % 2 == 0){
